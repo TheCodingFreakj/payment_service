@@ -17,7 +17,7 @@ class PaymentsViewSet(viewsets.ViewSet):
         transaction_id = request.data.get('transaction_id')
         ip_address = request.data.get('ip_address')
         logger.debug(f"Received payment request: order_id={order_id}, total_amount={total_amount}, payment_method={payment_method}")
-
+        payment_strategy = None
         try:
             if payment_method == 'stripe':
                 payment_strategy = StripePaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
