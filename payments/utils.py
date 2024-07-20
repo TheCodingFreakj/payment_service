@@ -27,6 +27,7 @@ class CircuitBreaker:
         try:
             result = func(*args, **kwargs)
             self.reset()
+            logger.info(f"Function call successful, {result}")
             logger.info("Function call successful, circuit breaker state reset to CLOSED")
             return result
         except Exception as e:

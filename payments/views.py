@@ -30,8 +30,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                 return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
             
             payment_service = PaymentService(payment_strategy)
-            logger.debug(f"Created PaymentService for order_id={order_id}")
-            return Response({'payment_service': payment_service.to_dict()})
+            logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
+            return payment_service.initiate_payment()
+            # return Response({'payment_service': payment_service.to_dict()})
         
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")

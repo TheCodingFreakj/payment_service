@@ -10,10 +10,10 @@ from abc import ABC, abstractmethod
 
 class PaymentStrategy(ABC):
     @abstractmethod
-    def initiate_payment(self):
+    def initiate_startegy_payment(self):
         pass
 class StripePaymentStrategy(PaymentStrategy):
-    def initiate_payment(self, order):
+    def initiate_startegy_payment(self, order):
         try:
             response = requests.post('https://stripe.example.com/pay', json={
                 'order_id': order.id,
@@ -40,7 +40,7 @@ class StripePaymentStrategy(PaymentStrategy):
             raise
 
 class PayPalPaymentStrategy(PaymentStrategy):
-    def initiate_payment(self, order):
+    def initiate_startegy_payment(self, order):
         try:
             response = requests.post('https://paypal.example.com/pay', json={
                 'order_id': order.id,
@@ -73,7 +73,7 @@ class RazorPayStrategy(PaymentStrategy):
         self.user = user
         self.total_amount = total_amount
 
-    def initiate_payment(self):
+    def initiate_startegy_payment(self):
         try:
 
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
