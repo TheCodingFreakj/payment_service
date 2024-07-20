@@ -26,7 +26,7 @@ class PaymentsViewSet(viewsets.ViewSet):
             else:
                 return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
             payment_service = PaymentService(payment_strategy)
-            return payment_service.initiate_payment(total_amount,user,order_id)
+            return payment_service.initiate_payment()
            
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
