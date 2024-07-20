@@ -31,8 +31,9 @@ class PaymentsViewSet(viewsets.ViewSet):
             
             payment_service = PaymentService(payment_strategy)
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
-            return payment_service.initiate_payment()
-         
+            response = payment_service.initiate_payment()
+            logger.debug(f"Logging the response={response}")
+            return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
         
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
