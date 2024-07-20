@@ -38,19 +38,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                 # Log the transaction initiation
                 send_log({'type': 'transaction', 'data': transaction_data})
                 logger.debug(f"Selected RazorPayStrategy for order_id={order_id}")
-            else:
-                transaction_data = {
-                    'transaction_id':transaction_id,
-                    'user_id': user,
-                    'payment_method': "POST",
-                    'status': 'failed',
-                    'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': get_user_location(ip_address)
-                }
-                # Log the transaction initiation
-                send_log({'type': 'transaction', 'data': transaction_data})
-                logger.error(f"Invalid payment method: {payment_method}")
-                raise
+            
                 # return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
             
             payment_service = PaymentService(payment_strategy)
