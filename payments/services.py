@@ -3,7 +3,7 @@ import logging
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .utils import CircuitBreaker, CircuitBreakerError
 from .strategies import PaymentStrategy
-
+from django.http import JsonResponse
 from .loggin_config import logger
 from rest_framework.response import Response
 # Initialize a circuit breaker instance
@@ -34,4 +34,8 @@ class PaymentService:
         
         except Exception as e:
             logger.error(f"Payment initiation to the circuit breaker failed: {e}")
-            return Response({'error': 'Payment initiation to the circuit breaker failed'}, status=500)
+            error_data = {
+            'error': str(e),
+            'status': 'error'
+            }
+            return JsonResponse(error_data, status=500)
