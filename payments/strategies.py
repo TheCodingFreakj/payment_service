@@ -6,7 +6,7 @@ import logging
 from .logsProducer import send_log, get_user_location
 from .models import Payment
 from django.conf import settings
-logger = logging.getLogger(__name__)
+from .loggin_config import logger
 from abc import ABC, abstractmethod
 
 class PaymentStrategy(ABC):

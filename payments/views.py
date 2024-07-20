@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from .services import  PaymentService
 from .logsProducer import send_log, get_user_location
 from .strategies import StripePaymentStrategy, PayPalPaymentStrategy,RazorPayStrategy
-logger = logging.getLogger(__name__)
+from .loggin_config import logger
 class PaymentsViewSet(viewsets.ViewSet):
     def create(self, request):
         user = 1

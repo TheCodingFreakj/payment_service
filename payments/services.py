@@ -4,7 +4,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from .utils import CircuitBreaker
 from .strategies import PaymentStrategy
 
-logger = logging.getLogger(__name__)
+from .loggin_config import logger
 
 # Initialize a circuit breaker instance
 circuit_breaker = CircuitBreaker(failure_threshold=5, recovery_time=60)

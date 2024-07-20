@@ -4,7 +4,7 @@ import time
 from .logsProducer import send_log, get_user_location
 # Configure the logging
 logging.basicConfig(level=logging.info)
-logger = logging.getLogger(__name__)
+from .loggin_config import logger
 
 class CircuitBreaker:
     def __init__(self, failure_threshold=5, recovery_time=60):

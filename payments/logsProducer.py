@@ -5,7 +5,7 @@ from datetime import datetime
 
 import requests
 
-logger = logging.getLogger(__name__)
+from .loggin_config import logger
 
 def send_log(log_data):
     try:
