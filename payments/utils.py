@@ -65,7 +65,7 @@ class CircuitBreaker:
             if self.failures >= self.failure_threshold:
                 self.state = 'OPEN'
                 logger.warning("Failure threshold reached. Transitioning to OPEN state")
-            return CircuitBreakerError(e)
+            return CircuitBreakerError(e, "Function call failed within CircuitBreaker")
 
     def reset(self):
         self.failures = 0
