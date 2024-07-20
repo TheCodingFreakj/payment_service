@@ -14,7 +14,11 @@ class PaymentService:
         self.strategy = strategy
       
 
-
+    def to_dict(self):
+        return {
+            'strategy': self.strategy.__class__.__name__,
+            'message':'Payment Initiated Successfully'
+        }
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def initiate_payment(self):
         try:
