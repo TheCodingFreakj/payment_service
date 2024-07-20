@@ -12,28 +12,28 @@ circuit_breaker = CircuitBreaker(failure_threshold=5, recovery_time=60)
 class PaymentService:
     def __init__(self, strategy: PaymentStrategy):
         self.strategy = strategy
-      
 
     def to_dict(self):
         return {
             'strategy': self.strategy.__class__.__name__,
-            'message':'Payment Initiated Successfully'
+            'message': 'Payment Initiated Successfully'
         }
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def initiate_payment(self):
         try:
-            logger.debug(f"Initiating payment for order  using strategy {self.strategy.__class__.__name__}")
-            if self.strategy is not None:
-                # Call to payment strategy within the circuit breaker
-                result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
-                
-                if 'error' in result:
-                    logger.error(f"Payment strategy failed for order : {result['error']}")
-                    raise
-                
-                logger.debug(f"Payment strategy succeeded for order ")
-                return Response({'result': result})
+            logger.debug(f"Initiating payment for order using strategy {self.strategy.__class__.__name__}")
+            
+            # Call to payment strategy within the circuit breaker
+            result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
+            
+            if 'error' in result:
+                logger.error(f"Payment strategy failed: {result['error']}")
+                return Response({'error': result['error']}, status=500)
+            
+            logger.debug(f"Payment strategy succeeded")
+            return Response({'result': result})
         
         except Exception as e:
-            logger.error(f"Payment initiation to the circuit breaker failed for order : {e}")
-            return Response({'error': 'Payment initiation to the circuit breaker failed for order'}, status=500)
+            logger.error(f"Payment initiation to the circuit breaker failed: {e}")
+            return Response({'error': 'Payment initiation to the circuit breaker failed'}, status=500)
