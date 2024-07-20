@@ -29,7 +29,7 @@ class PaymentService:
             
             if 'error' in result:
                 logger.error(f"Payment strategy failed for order : {result['error']}")
-                return Response({'error': result['error']}, status=500)
+                raise
             
             logger.debug(f"Payment strategy succeeded for order ")
             return Response({'result': result})
