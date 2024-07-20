@@ -22,13 +22,18 @@ class PaymentService:
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def initiate_payment(self):
         try:
+            logger.debug(f"Initiating payment for order  using strategy {self.strategy.__class__.__name__}")
+            
             # Call to payment strategy within the circuit breaker
-            result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
-            if isinstance(result, CircuitBreakerError):
-               logger.error(f"Function call resulted in an error: {result}")
-               return Response({'error': str(result)}, status=500)
-            else:
-                return Response({'result': result})
+            result = circuit_breaker.call(self.strategy.initiate_strategy_payment, self.order)
+            
+            if 'error' in result:
+                logger.error(f"Payment strategy failed for order : {result['error']}")
+                return Response({'error': result['error']}, status=500)
+            
+            logger.debug(f"Payment strategy succeeded for order ")
+            return Response({'result': result})
+        
         except Exception as e:
-            logger.error(f"Payment initiation to the circuit breaker failed for order {self.order}: {e}")
-            return e
+            logger.error(f"Payment initiation to the circuit breaker failed for order : {e}")
+            return Response({'error': str(e)}, status=500)
