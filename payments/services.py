@@ -23,7 +23,7 @@ class PaymentService:
     def initiate_payment(self):
         try:
             # Call to payment strategy within the circuit breaker
-            return circuit_breaker.call(self.strategy.initiate_startegy_payment)
+            return circuit_breaker.call(self.strategy.initiate_strategy_payment)
         except Exception as e:
             
             logger.error(f"Payment initiation to the circuit breaker failed for order {self.order}: {e}")
