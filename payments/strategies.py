@@ -72,12 +72,12 @@ class RazorPayStrategy(PaymentStrategy):
         self.order_id = order_id
         self.user = user
         self.total_amount = total_amount
-
+# settings.RAZORPAY_KEY_ID
     def initiate_strategy_payment(self):
         try:
             logger.debug(f"Initiating RazorPay payment for order {self.order_id}, user {self.user}, amount {self.total_amount}")
 
-            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+            client = razorpay.Client(auth=('auth', settings.RAZORPAY_KEY_SECRET))
             razorpay_order = client.order.create(
                 {"amount": int(self.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
             )
