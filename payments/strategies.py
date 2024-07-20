@@ -68,19 +68,19 @@ class PayPalPaymentStrategy(PaymentStrategy):
 
 
 class RazorPayStrategy(PaymentStrategy):
-    def initiate_payment(self, order):
+    def initiate_payment(self, order_id, user,total_amount):
         try:
 
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             razorpay_order = client.order.create(
-                {"amount": int(order.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
+                {"amount": int(order_id.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
             )
 
             logger.debug(f"RazorPay Order gets created------> {razorpay_order}")
 
             payment = Payment.objects.create(
-                order=order,
-                amount=order.total_amount,
+                order=order_id,
+                amount=total_amount,
                 status=razorpay_order['status'],
                 transaction_id=razorpay_order.get('id')
             )
@@ -88,10 +88,10 @@ class RazorPayStrategy(PaymentStrategy):
             logger.debug(f"Creating the payment object in the inhouse database------> {payment}")
             return payment
         except requests.RequestException as e:
-            logger.error(f"PayPal payment initiation failed for order {order.id}: {e}")
+            logger.error(f"PayPal payment initiation failed for order {order_id}: {e}")
             Payment.objects.create(
-                order=order,
-                amount=order.total_amount,
+                order=order_id,
+                amount=total_amount,
                 status='failure'
             )
             raise        

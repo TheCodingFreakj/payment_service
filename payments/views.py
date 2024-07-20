@@ -18,15 +18,15 @@ class PaymentsViewSet(viewsets.ViewSet):
         
         try:
             if payment_method == 'stripe':
-                payment_strategy = StripePaymentStrategy()
+                payment_strategy = StripePaymentStrategy(order_id, user,total_amount)
             elif payment_method == 'paypal':
-                payment_strategy = PayPalPaymentStrategy()
+                payment_strategy = PayPalPaymentStrategy(order_id, user,total_amount)
             elif payment_method == 'razorpay':
-                payment_strategy = RazorPayStrategy()    
+                payment_strategy = RazorPayStrategy(order_id, user,total_amount)    
             else:
                 return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
-            payment_service = PaymentService(payment_strategy,order_id, user,total_amount)
-            return payment_service.initiate_payment()
+            payment_service = PaymentService(payment_strategy)
+            return payment_service
            
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
