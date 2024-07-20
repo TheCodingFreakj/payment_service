@@ -23,16 +23,16 @@ class PaymentService:
     def initiate_payment(self):
         try:
             logger.debug(f"Initiating payment for order  using strategy {self.strategy.__class__.__name__}")
-            
-            # Call to payment strategy within the circuit breaker
-            result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
-            
-            if 'error' in result:
-                logger.error(f"Payment strategy failed for order : {result['error']}")
-                raise
-            
-            logger.debug(f"Payment strategy succeeded for order ")
-            return Response({'result': result})
+            if self.strategy is not None:
+                # Call to payment strategy within the circuit breaker
+                result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
+                
+                if 'error' in result:
+                    logger.error(f"Payment strategy failed for order : {result['error']}")
+                    raise
+                
+                logger.debug(f"Payment strategy succeeded for order ")
+                return Response({'result': result})
         
         except Exception as e:
             logger.error(f"Payment initiation to the circuit breaker failed for order : {e}")
