@@ -25,7 +25,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                 payment_strategy = RazorPayStrategy()    
             else:
                 return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
-            payment_service = PaymentService(payment_strategy)
+            payment_service = PaymentService(payment_strategy,order_id, user,total_amount)
             return payment_service.initiate_payment()
            
         except Exception as e:
