@@ -61,7 +61,7 @@ class CircuitBreaker:
             if self.failures >= self.failure_threshold:
                 self.state = 'OPEN'
                 logger.warning("Failure threshold reached. Transitioning to OPEN state")
-            raise e
+            return e
 
     def reset(self):
         self.failures = 0
