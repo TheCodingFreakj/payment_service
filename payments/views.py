@@ -40,7 +40,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                 logger.debug(f"Selected RazorPayStrategy for order_id={order_id}")
             
                 # return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+                    # Check if strategy is None
+            if payment_strategy is None:
+                 raise ValueError("Payment strategy must be provided")
             payment_service = PaymentService(payment_strategy)
             transaction_data = {
                     'transaction_id':transaction_id,
@@ -55,8 +57,12 @@ class PaymentsViewSet(viewsets.ViewSet):
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
             response = payment_service.initiate_payment()
             logger.debug(f"Logging the response={response}")
+            if 'error' in response:
+                raise ValueError(response['error'])
             return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
-        
+        except ValueError as e:
+            logger.error(f"Payment initiation failed for order {order_id}: {e}")
+            return Response({'status': 'error', 'message': str(e)}, status=500)
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
             return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
