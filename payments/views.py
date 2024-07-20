@@ -55,14 +55,47 @@ class PaymentsViewSet(viewsets.ViewSet):
                 # Log the transaction initiation
             send_log({'type': 'transaction', 'data': transaction_data})
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
-            response = payment_service.initiate_payment()
+            response = payment_service.initiate_payment(transaction_id,user,ip_address )
             logger.debug(f"Logging the response={response}")
             if 'error' in response:
+                transaction_data = {
+                    'transaction_id':transaction_id,
+                    'user_id': user,
+                    'payment_method': "POST",
+                    'status': 'failed',
+                    'failed_reason':response['error'],
+                    'initiated_at': datetime.datetime.now().isoformat(),
+                    'location': ip_address
+                }
+                # Log the transaction initiation
+                send_log({'type': 'transaction', 'data': transaction_data})
                 raise ValueError(response['error'])
             return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
         except ValueError as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
+            transaction_data = {
+                    'transaction_id':transaction_id,
+                    'user_id': user,
+                    'payment_method': "POST",
+                    'status': 'failed',
+                    'failed_reason':str(e),
+                    'initiated_at': datetime.datetime.now().isoformat(),
+                    'location': ip_address
+                }
+                # Log the transaction initiation
+            send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': str(e)}, status=500)
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
+            transaction_data = {
+                    'transaction_id':transaction_id,
+                    'user_id': user,
+                    'payment_method': "POST",
+                    'status': 'failed',
+                    'failed_reason':str(e),
+                    'initiated_at': datetime.datetime.now().isoformat(),
+                    'location': ip_address
+                }
+                # Log the transaction initiation
+            send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
