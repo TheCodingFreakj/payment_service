@@ -50,7 +50,8 @@ class PaymentsViewSet(viewsets.ViewSet):
                 # Log the transaction initiation
                 send_log({'type': 'transaction', 'data': transaction_data})
                 logger.error(f"Invalid payment method: {payment_method}")
-                return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
+                raise
+                # return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
             
             payment_service = PaymentService(payment_strategy)
             transaction_data = {
