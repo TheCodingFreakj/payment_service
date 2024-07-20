@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 
 class PaymentStrategy(ABC):
     @abstractmethod
-    def initiate_payment(self, order):
+    def initiate_payment(self):
         pass
 class StripePaymentStrategy(PaymentStrategy):
     def initiate_payment(self, order):
@@ -68,19 +68,24 @@ class PayPalPaymentStrategy(PaymentStrategy):
 
 
 class RazorPayStrategy(PaymentStrategy):
-    def initiate_payment(self, order_id, user,total_amount):
+    def __init__(self,order_id, user,total_amount):
+        self.order_id = order_id
+        self.user = user
+        self.total_amount = total_amount
+
+    def initiate_payment(self):
         try:
 
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             razorpay_order = client.order.create(
-                {"amount": int(order_id.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
+                {"amount": int(self.order_id.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
             )
 
             logger.debug(f"RazorPay Order gets created------> {razorpay_order}")
 
             payment = Payment.objects.create(
-                order=order_id,
-                amount=total_amount,
+                order=self.order_id,
+                amount=self.total_amount,
                 status=razorpay_order['status'],
                 transaction_id=razorpay_order.get('id')
             )
@@ -90,8 +95,8 @@ class RazorPayStrategy(PaymentStrategy):
         except requests.RequestException as e:
             logger.error(f"PayPal payment initiation failed for order {order_id}: {e}")
             Payment.objects.create(
-                order=order_id,
-                amount=total_amount,
+                order=self.order_id,
+                amount=self.total_amount,
                 status='failure'
             )
             raise        
