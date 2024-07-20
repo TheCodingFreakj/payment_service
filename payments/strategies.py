@@ -91,7 +91,12 @@ class RazorPayStrategy(PaymentStrategy):
             )
 
             logger.debug(f"Creating the payment object in the inhouse database------> {payment}")
-            return payment
+            return {
+            'order_id': self.order_id,
+            'user': self.user,
+            'total_amount': self.total_amount,
+            'payment_method': 'razorpay'
+           }
         except requests.RequestException as e:
             logger.error(f"PayPal payment initiation failed for order {order_id}: {e}")
             Payment.objects.create(
