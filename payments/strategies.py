@@ -73,15 +73,16 @@ class RazorPayStrategy(PaymentStrategy):
         self.user = user
         self.total_amount = total_amount
 
-    def initiate_startegy_payment(self):
+    def initiate_strategy_payment(self):
         try:
+            logger.debug(f"Initiating RazorPay payment for order {self.order_id}, user {self.user}, amount {self.total_amount}")
 
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             razorpay_order = client.order.create(
-                {"amount": int(self.order_id.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
+                {"amount": int(self.total_amount) * 100, "currency": "INR", "payment_capture": "1"}
             )
 
-            logger.debug(f"RazorPay Order gets created------> {razorpay_order}")
+            logger.debug(f"RazorPay order created: {razorpay_order}")
 
             payment = Payment.objects.create(
                 order=self.order_id,
@@ -90,18 +91,19 @@ class RazorPayStrategy(PaymentStrategy):
                 transaction_id=razorpay_order.get('id')
             )
 
-            logger.debug(f"Creating the payment object in the inhouse database------> {payment}")
+            logger.debug(f"Payment object created in the database: {payment}")
+
             return {
-            'order_id': self.order_id,
-            'user': self.user,
-            'total_amount': self.total_amount,
-            'payment_method': 'razorpay'
-           }
+                'order_id': self.order_id,
+                'user': self.user,
+                'total_amount': self.total_amount,
+                'payment_method': 'razorpay'
+            }
         except requests.RequestException as e:
-            logger.error(f"PayPal payment initiation failed for order {self.order_id}: {e}")
+            logger.error(f"RazorPay payment initiation failed for order {self.order_id}: {e}")
             Payment.objects.create(
                 order=self.order_id,
                 amount=self.total_amount,
                 status='failure'
             )
-            raise        
+            raise
