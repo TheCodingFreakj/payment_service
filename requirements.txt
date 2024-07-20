@@ -1,0 +1,9 @@
+djangorestframework
+django-environ
+gunicorn
+psycopg2-binary
+djangorestframework-simplejwt
+python-dotenv
+tenacity
+razorpay
+requests
