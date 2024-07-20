@@ -22,6 +22,8 @@ class PaymentService:
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def initiate_payment(self):
         try:
+            if (self.strategy.__class__.__name__ == None):
+                raise Exception("Issue is there")
             logger.debug(f"Initiating payment for order using strategy {self.strategy.__class__.__name__}")
             
             # Call to payment strategy within the circuit breaker
