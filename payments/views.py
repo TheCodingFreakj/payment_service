@@ -29,5 +29,5 @@ class PaymentsViewSet(viewsets.ViewSet):
             return payment_service.initiate_payment(total_amount,user,order_id)
            
         except Exception as e:
-            logger.error(f"Payment initiation failed for order {payment_service.id}: {e}")
+            logger.error(f"Payment initiation failed for order {order_id}: {e}")
             return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
