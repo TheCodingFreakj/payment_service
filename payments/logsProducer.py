@@ -16,6 +16,10 @@ def send_log(log_data):
         channel.queue_declare(queue='logs')
         channel.basic_publish(exchange='', routing_key='logs', body=json.dumps(log_data))
         connection.close()
+    except pika.exceptions.AMQPConnectionError as e:
+        logger.error(f"Connection error while sending log message: {e}")
+    except pika.exceptions.ProbableAuthenticationError as e:
+        logger.error(f"Authentication error while sending log message: {e}")
     except Exception as e:
         logger.error(f"Error sending log message: {e}")
 
