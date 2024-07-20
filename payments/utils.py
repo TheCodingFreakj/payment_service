@@ -6,6 +6,10 @@ from .logsProducer import send_log, get_user_location
 logging.basicConfig(level=logging.info)
 from .loggin_config import logger
 
+class CircuitBreakerError(Exception):
+    def __init__(self, original_exception, message="Circuit breaker triggered"):
+        super().__init__(f"{message}: {original_exception}")
+        self.original_exception = original_exception
 class CircuitBreaker:
     def __init__(self, failure_threshold=5, recovery_time=60):
         self.failure_threshold = failure_threshold
@@ -61,7 +65,7 @@ class CircuitBreaker:
             if self.failures >= self.failure_threshold:
                 self.state = 'OPEN'
                 logger.warning("Failure threshold reached. Transitioning to OPEN state")
-            return e
+            return CircuitBreakerError(e)
 
     def reset(self):
         self.failures = 0
