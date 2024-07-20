@@ -25,7 +25,7 @@ class PaymentService:
             logger.debug(f"Initiating payment for order  using strategy {self.strategy.__class__.__name__}")
             
             # Call to payment strategy within the circuit breaker
-            result = circuit_breaker.call(self.strategy.initiate_strategy_payment, self.order)
+            result = circuit_breaker.call(self.strategy.initiate_strategy_payment)
             
             if 'error' in result:
                 logger.error(f"Payment strategy failed for order : {result['error']}")
@@ -36,4 +36,4 @@ class PaymentService:
         
         except Exception as e:
             logger.error(f"Payment initiation to the circuit breaker failed for order : {e}")
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': 'Payment initiation to the circuit breaker failed for order'}, status=500)
