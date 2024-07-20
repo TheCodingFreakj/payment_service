@@ -98,7 +98,7 @@ class RazorPayStrategy(PaymentStrategy):
             'payment_method': 'razorpay'
            }
         except requests.RequestException as e:
-            logger.error(f"PayPal payment initiation failed for order {order_id}: {e}")
+            logger.error(f"PayPal payment initiation failed for order {self.order_id}: {e}")
             Payment.objects.create(
                 order=self.order_id,
                 amount=self.total_amount,
