@@ -33,7 +33,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'payment_method': "POST",
                     'status': 'processing',
                     'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': get_user_location(ip_address)
+                    'location': ip_address
                 }
                 # Log the transaction initiation
                 send_log({'type': 'transaction', 'data': transaction_data})
@@ -48,7 +48,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'payment_method': "POST",
                     'status': 'processing',
                     'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': get_user_location(ip_address)
+                    'location': ip_address
                 }
                 # Log the transaction initiation
             send_log({'type': 'transaction', 'data': transaction_data})

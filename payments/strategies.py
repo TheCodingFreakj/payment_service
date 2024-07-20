@@ -101,7 +101,7 @@ class RazorPayStrategy(PaymentStrategy):
                     'payment_method': "POST",
                     'status': 'processing',
                     'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': get_user_location(self.ip_address)
+                    'location': self.ip_address
                 }
                 # Log the transaction initiation
             send_log({'type': 'transaction', 'data': transaction_data})
@@ -125,7 +125,7 @@ class RazorPayStrategy(PaymentStrategy):
                     'payment_method': "POST",
                     'status': 'failed',
                     'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': get_user_location(self.ip_address)
+                    'location': self.ip_address
                 }
                 # Log the transaction initiation
             send_log({'type': 'transaction', 'data': transaction_data})
