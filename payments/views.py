@@ -6,12 +6,15 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from .profiling import profile_view
+
 from .kafka_producer import KafkaProducerService
 from .services import  PaymentService
 from .logsProducer import send_log, get_user_location
 from .strategies import StripePaymentStrategy, PayPalPaymentStrategy,RazorPayStrategy
 from .loggin_config import logger
 class PaymentsViewSet(viewsets.ViewSet):
+    @profile_view
     def create(self, request):
         user = 1
         order_id = request.data.get('order_id')

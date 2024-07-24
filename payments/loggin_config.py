@@ -1,5 +1,3 @@
-# logging_config.py
-
 import logging
 
 # Create a logger
@@ -10,14 +8,23 @@ logger.setLevel(logging.DEBUG)  # Set this to the desired level for your applica
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)  # Set this to the desired level for your application
 
+# Create file handler for profiling logs
+fh = logging.FileHandler('profiling.log')
+fh.setLevel(logging.DEBUG)  # Set this to the desired level for profiling logs
+
 # Create formatter
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-# Add formatter to ch
+# Add formatter to handlers
 ch.setFormatter(formatter)
+fh.setFormatter(formatter)
 
-# Add ch to logger
+# Add handlers to logger
 logger.addHandler(ch)
+logger.addHandler(fh)
 
-# Suppress RabbitMQ (pika) library logs
-logging.getLogger('pika').setLevel(logging.WARNING)  # Suppress pika logs lower than WARNING
+# Suppress Kafka library logs below WARNING level
+logging.getLogger('kafka').setLevel(logging.WARNING)  # Suppress Kafka logs lower than WARNING
+
+# Optionally, suppress other verbose libraries if needed
+# logging.getLogger('another_library').setLevel(logging.WARNING)
