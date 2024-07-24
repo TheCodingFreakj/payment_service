@@ -4,7 +4,15 @@ import ssl
 import json
 
 class KafkaProducerService:
-    def __init__(self):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(KafkaProducerService, cls).__new__(cls)
+            cls._instance._initialize(*args, **kwargs)
+        return cls._instance
+
+    def _initialize(self):
         context = ssl.create_default_context()
         context.load_verify_locations(settings.KAFKA_CA_CERT)
         context.load_cert_chain(certfile=settings.KAFKA_CLIENT_CERT, keyfile=settings.KAFKA_CLIENT_KEY)
@@ -20,6 +28,7 @@ class KafkaProducerService:
             retry_backoff_ms=500,  # Backoff time between retries
             linger_ms=10  # Additional options can be added as needed
         )
+        
     def send_message(self, topic, value):
         self.producer.send(topic, value)
         self.producer.flush()
