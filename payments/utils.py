@@ -4,7 +4,7 @@ import time
 
 from django.conf import settings
 
-from .kafka_producer import KafkaProducerService
+from .kafka_producer import KafkaProducerPool
 from .logsProducer import send_log, get_user_location
 # Configure the logging
 logging.basicConfig(level=logging.debug)
@@ -32,7 +32,7 @@ class CircuitBreaker:
             else:
                 logger.warning("Circuit breaker is open. Cannot call function.")
                 return CircuitBreakerError('Circuit breaker is open')
-        producer = KafkaProducerService()
+        producer = KafkaProducerPool(pool_size=5)
         try:
             result = func(*args, **kwargs)
             logger.debug(f"Function call successful for args: {args}")
