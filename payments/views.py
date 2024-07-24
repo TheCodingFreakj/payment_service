@@ -24,13 +24,13 @@ class PaymentsViewSet(viewsets.ViewSet):
         producer = KafkaProducerService()
         try:
             if payment_method == 'stripe':
-                payment_strategy = StripePaymentStrategy(order_id,producer, user, total_amount,transaction_id,ip_address)
+                payment_strategy = StripePaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
                 logger.debug(f"Selected StripePaymentStrategy for order_id={order_id}")
             elif payment_method == 'paypal':
-                payment_strategy = PayPalPaymentStrategy(order_id,producer, user, total_amount,transaction_id,ip_address)
+                payment_strategy = PayPalPaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
                 logger.debug(f"Selected PayPalPaymentStrategy for order_id={order_id}")
             elif payment_method == 'razorpay':
-                payment_strategy = RazorPayStrategy(order_id, producer, user, total_amount,transaction_id,ip_address)
+                payment_strategy = RazorPayStrategy(order_id,  user, total_amount,transaction_id,ip_address)
                 transaction_data = {
                     'transaction_id':transaction_id,
                     'user_id': user,
