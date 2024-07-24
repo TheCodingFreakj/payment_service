@@ -16,9 +16,9 @@ class KafkaProducerService:
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
             acks='all',
             retries=5,
-            enable_idempotence=True,
-            request_timeout_ms=30000,  # Request timeout
-            delivery_timeout_ms=30000  # Delivery timeout
+            request_timeout_ms=30000,
+            retry_backoff_ms=500,  # Backoff time between retries
+            linger_ms=10  # Additional options can be added as needed
         )
     def send_message(self, topic, value):
         self.producer.send(topic, value)
