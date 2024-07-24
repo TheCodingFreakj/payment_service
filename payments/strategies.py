@@ -4,7 +4,7 @@ import razorpay
 import requests
 import logging
 
-from .kafka_producer import KafkaProducerService
+from .kafka_producer import KafkaProducerPool
 from .logsProducer import send_log, get_user_location
 from .models import Payment
 from django.conf import settings
@@ -79,7 +79,7 @@ class RazorPayStrategy(PaymentStrategy):
         self.transaction_id = transaction_id
 # settings.RAZORPAY_KEY_ID
     def initiate_strategy_payment(self):
-        producer = KafkaProducerService()
+        producer = KafkaProducerPool(pool_size=5)
         try:
             logger.debug(f"Initiating RazorPay payment for order {self.order_id}, user {self.user}, amount {self.total_amount}")
 
