@@ -87,23 +87,23 @@ class PaymentsViewSet(viewsets.ViewSet):
                 #send_log({'type': 'transaction', 'data': transaction_data})
                 raise ValueError(response['error'])
             return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
-        except ValueError as e:
-            logger.error(f"Payment initiation failed for order {order_id}: {e}")
-            transaction_data = {
-                    'transaction_id':transaction_id,
-                    'user_id': user,
-                    'payment_method': "POST",
-                    'status': 'failed',
-                    'failed_reason':str(e),
-                    'initiated_at': datetime.datetime.now().isoformat(),
-                    'location': ip_address
-                }
-                # Log the transaction initiation
+        # except ValueError as e:
+        #     logger.error(f"Payment initiation failed for order {order_id}: {e}")
+        #     transaction_data = {
+        #             'transaction_id':transaction_id,
+        #             'user_id': user,
+        #             'payment_method': "POST",
+        #             'status': 'failed',
+        #             'failed_reason':str(e),
+        #             'initiated_at': datetime.datetime.now().isoformat(),
+        #             'location': ip_address
+        #         }
+        #         # Log the transaction initiation
             
     
-            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
-            #send_log({'type': 'transaction', 'data': transaction_data})
-            return Response({'status': 'error', 'message': str(e)}, status=500)
+        #     producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
+        #     #send_log({'type': 'transaction', 'data': transaction_data})
+        #     return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
             transaction_data = {
