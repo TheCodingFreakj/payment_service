@@ -11,14 +11,15 @@ class KafkaProducerService:
 
         self.producer = KafkaProducer(
             bootstrap_servers=settings.KAFKA_BROKER_URLS,
-            security_protocol="SSL",
+            security_protocol='SSL',
             ssl_context=context,
-            sasl_mechanism="PLAIN",
-            sasl_plain_username=settings.KAFKA_USERNAME,
-            sasl_plain_password=settings.KAFKA_PASSWORD,
+            # sasl_mechanism = 'SCRAM-SHA-256',
+            # sasl_plain_username=settings.KAFKA_USERNAME,
+            # sasl_plain_password=settings.KAFKA_PASSWORD,
+            # security_protocol="SASL_SSL",
+            # ssl_cafile=settings.KAFKA_CA_CERT,
             value_serializer=lambda v: json.dumps(v).encode('utf-8')
         )
-
     def send_message(self, topic, value):
         self.producer.send(topic, value)
         self.producer.flush()
