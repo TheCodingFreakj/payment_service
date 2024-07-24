@@ -65,7 +65,7 @@ class PaymentsViewSet(viewsets.ViewSet):
             producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data})     
             #send_log({'type': 'transaction', 'data': transaction_data})
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
-            response = payment_service.initiate_payment(producer, transaction_id,user,ip_address )
+            response = payment_service.initiate_payment(transaction_id,user,ip_address )
             logger.debug(f"Logging the response={response}")
             if 'error' in response:
                 transaction_data = {
