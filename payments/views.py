@@ -1,9 +1,12 @@
 # orders/viewsets.py
 import datetime
 import logging
+from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
+from .kafka_producer import KafkaProducerService
 from .services import  PaymentService
 from .logsProducer import send_log, get_user_location
 from .strategies import StripePaymentStrategy, PayPalPaymentStrategy,RazorPayStrategy
@@ -18,6 +21,7 @@ class PaymentsViewSet(viewsets.ViewSet):
         ip_address = request.data.get('ip_address')
         logger.debug(f"Received payment request: order_id={order_id}, total_amount={total_amount}, payment_method={payment_method}")
         payment_strategy = None
+        producer = KafkaProducerService()
         try:
             if payment_method == 'stripe':
                 payment_strategy = StripePaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
@@ -36,6 +40,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'location': ip_address
                 }
                 # Log the transaction initiation
+                
+    
+                producer.send_message(settings.KAFKA_TOPIC, transaction_data) 
                 send_log({'type': 'transaction', 'data': transaction_data})
                 logger.debug(f"Selected RazorPayStrategy for order_id={order_id}")
             
@@ -53,6 +60,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'location': ip_address
                 }
                 # Log the transaction initiation
+            
+    
+            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data})     
             send_log({'type': 'transaction', 'data': transaction_data})
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
             response = payment_service.initiate_payment(transaction_id,user,ip_address )
@@ -68,6 +78,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'location': ip_address
                 }
                 # Log the transaction initiation
+                
+    
+                producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
                 send_log({'type': 'transaction', 'data': transaction_data})
                 raise ValueError(response['error'])
             return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
@@ -83,6 +96,9 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'location': ip_address
                 }
                 # Log the transaction initiation
+            
+    
+            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
             send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': str(e)}, status=500)
         except Exception as e:
@@ -97,5 +113,8 @@ class PaymentsViewSet(viewsets.ViewSet):
                     'location': ip_address
                 }
                 # Log the transaction initiation
+            
+    
+            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
             send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
