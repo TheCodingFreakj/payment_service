@@ -8,12 +8,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from .profiling import profile_view
 
-from .kafka_producer import KafkaProducerService
+from .kafka_producer import KafkaProducerPool
 from .services import  PaymentService
 from .logsProducer import send_log, get_user_location
 from .strategies import StripePaymentStrategy, PayPalPaymentStrategy,RazorPayStrategy
 from .loggin_config import logger
 class PaymentsViewSet(viewsets.ViewSet):
+
     @profile_view
     def create(self, request):
         user = 1
@@ -24,7 +25,7 @@ class PaymentsViewSet(viewsets.ViewSet):
         ip_address = request.data.get('ip_address')
         logger.debug(f"Received payment request: order_id={order_id}, total_amount={total_amount}, payment_method={payment_method}")
         payment_strategy = None
-        producer = KafkaProducerService()
+        producer = KafkaProducerPool(pool_size=5)
         try:
             if payment_method == 'stripe':
                 payment_strategy = StripePaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
