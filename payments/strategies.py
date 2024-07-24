@@ -69,9 +69,10 @@ class PayPalPaymentStrategy(PaymentStrategy):
 
 
 class RazorPayStrategy(PaymentStrategy):
-    def __init__(self,order_id, user,total_amount, transaction_id, ip_address):
+    def __init__(self,order_id,producer, user,total_amount, transaction_id, ip_address):
         self.order_id = order_id
         self.user = user
+        self.producer = producer
         self.total_amount = total_amount
         self.ip_address = ip_address
         self.transaction_id = transaction_id
@@ -104,7 +105,8 @@ class RazorPayStrategy(PaymentStrategy):
                     'location': self.ip_address
                 }
                 # Log the transaction initiation
-            send_log({'type': 'transaction', 'data': transaction_data})
+            self.producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data})         
+            #send_log({'type': 'transaction', 'data': transaction_data})
             return {
                 'order_id': self.order_id,
                 'user': self.user,
@@ -128,5 +130,6 @@ class RazorPayStrategy(PaymentStrategy):
                     'location': self.ip_address
                 }
                 # Log the transaction initiation
-            send_log({'type': 'transaction', 'data': transaction_data})
+            self.producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data})    
+            #send_log({'type': 'transaction', 'data': transaction_data})
             raise

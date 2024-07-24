@@ -1,6 +1,10 @@
 import datetime
 import logging
 import time
+
+from django.conf import settings
+
+from .kafka_producer import KafkaProducerService
 from .logsProducer import send_log, get_user_location
 # Configure the logging
 logging.basicConfig(level=logging.debug)
@@ -28,7 +32,7 @@ class CircuitBreaker:
             else:
                 logger.warning("Circuit breaker is open. Cannot call function.")
                 return CircuitBreakerError('Circuit breaker is open')
-
+        producer = KafkaProducerService()
         try:
             result = func(*args, **kwargs)
             logger.debug(f"Function call successful for args: {args}")
@@ -44,7 +48,8 @@ class CircuitBreaker:
                 'location': get_user_location("ip_address")
             }
             # Log the transaction initiation
-            send_log({'type': 'transaction', 'data': transaction_data})
+            #send_log({'type': 'transaction', 'data': transaction_data})
+            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
             logger.debug("Function call successful, circuit breaker state reset to CLOSED")
             return result
         except Exception as e:
@@ -58,7 +63,8 @@ class CircuitBreaker:
                 'location': get_user_location("ip_address")
             }
             # Log the transaction failure
-            send_log({'type': 'transaction', 'data': transaction_data})
+            producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
+            #send_log({'type': 'transaction', 'data': transaction_data})
             self.last_failure_time = time.time()
             logger.error("Function call failed: %s", e)
             logger.debug("Failure count increased to %d", self.failures)

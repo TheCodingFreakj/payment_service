@@ -24,13 +24,13 @@ class PaymentsViewSet(viewsets.ViewSet):
         producer = KafkaProducerService()
         try:
             if payment_method == 'stripe':
-                payment_strategy = StripePaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
+                payment_strategy = StripePaymentStrategy(order_id,producer, user, total_amount,transaction_id,ip_address)
                 logger.debug(f"Selected StripePaymentStrategy for order_id={order_id}")
             elif payment_method == 'paypal':
-                payment_strategy = PayPalPaymentStrategy(order_id, user, total_amount,transaction_id,ip_address)
+                payment_strategy = PayPalPaymentStrategy(order_id,producer, user, total_amount,transaction_id,ip_address)
                 logger.debug(f"Selected PayPalPaymentStrategy for order_id={order_id}")
             elif payment_method == 'razorpay':
-                payment_strategy = RazorPayStrategy(order_id, user, total_amount,transaction_id,ip_address)
+                payment_strategy = RazorPayStrategy(order_id, producer, user, total_amount,transaction_id,ip_address)
                 transaction_data = {
                     'transaction_id':transaction_id,
                     'user_id': user,
@@ -43,7 +43,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                 
     
                 producer.send_message(settings.KAFKA_TOPIC, transaction_data) 
-                send_log({'type': 'transaction', 'data': transaction_data})
+                #send_log({'type': 'transaction', 'data': transaction_data})
                 logger.debug(f"Selected RazorPayStrategy for order_id={order_id}")
             
                 # return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -63,9 +63,9 @@ class PaymentsViewSet(viewsets.ViewSet):
             
     
             producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data})     
-            send_log({'type': 'transaction', 'data': transaction_data})
+            #send_log({'type': 'transaction', 'data': transaction_data})
             logger.debug(f"Created PaymentService for order_id={payment_service.initiate_payment}")
-            response = payment_service.initiate_payment(transaction_id,user,ip_address )
+            response = payment_service.initiate_payment(producer, transaction_id,user,ip_address )
             logger.debug(f"Logging the response={response}")
             if 'error' in response:
                 transaction_data = {
@@ -81,7 +81,7 @@ class PaymentsViewSet(viewsets.ViewSet):
                 
     
                 producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
-                send_log({'type': 'transaction', 'data': transaction_data})
+                #send_log({'type': 'transaction', 'data': transaction_data})
                 raise ValueError(response['error'])
             return Response({'status': 'success', 'message': response}, status=status.HTTP_200_OK)
         except ValueError as e:
@@ -99,7 +99,7 @@ class PaymentsViewSet(viewsets.ViewSet):
             
     
             producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
-            send_log({'type': 'transaction', 'data': transaction_data})
+            #send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': str(e)}, status=500)
         except Exception as e:
             logger.error(f"Payment initiation failed for order {order_id}: {e}")
@@ -116,5 +116,5 @@ class PaymentsViewSet(viewsets.ViewSet):
             
     
             producer.send_message(settings.KAFKA_TOPIC, {'type': 'transaction', 'data': transaction_data}) 
-            send_log({'type': 'transaction', 'data': transaction_data})
+            #send_log({'type': 'transaction', 'data': transaction_data})
             return Response({'status': 'error', 'message': 'Payment initiation failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
