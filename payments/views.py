@@ -49,8 +49,8 @@ class PaymentsViewSet(viewsets.ViewSet):
                 #send_log({'type': 'transaction', 'data': transaction_data})
                 logger.debug(f"Selected RazorPayStrategy for order_id={order_id}")
             
-                # return Response({'status': 'error', 'message': 'Invalid payment method.'}, status=status.HTTP_400_BAD_REQUEST)
-                    # Check if strategy is None
+            else:
+                raise ValueError("Unsupported payment method")
             if payment_strategy is None:
                  raise ValueError("Payment strategy must be provided")
             payment_service = PaymentService(payment_strategy)
