@@ -160,9 +160,9 @@ AUTHENTICATION_BACKENDS = (
 
 RAZORPAY_KEY_ID = 'rzp_test_nEnUNKr2hOkt0a'
 RAZORPAY_KEY_SECRET = 'D1007k6sTzFf6XuKR7GjlcRo'
-KAFKA_BROKER_URLS = 'kafka-195f06a3-pallavidapriya75-97f0.d.aivencloud.com:12785'  # Example: 'your-service-name.aivencloud.com:12345'
+KAFKA_BROKER_URLS = 'kafka-22753f33-priyaarshinipallavi-3893.g.aivencloud.com:22587'  # Example: 'your-service-name.aivencloud.com:12345'
 KAFKA_USERNAME = 'avnadmin'
-KAFKA_PASSWORD = 'AVNS_Vp_Bedp2jJjsYGcKT5x'
+KAFKA_PASSWORD = 'AVNS_3pb2ItKZq2fdtsorhKZ'
 KAFKA_TOPIC = 'Logs-Aggregate'
 KAFKA_CA_CERT = '/code/certs/ca.pem'
 KAFKA_CLIENT_CERT = '/code/certs/service.cert'

@@ -15,5 +15,14 @@ RUN pip install -r requirements.txt
 # Copy project
 COPY . /code/
 
-# Command to run the server
-CMD ["gunicorn", "--bind", "0.0.0.0:8004", "payment_service.wsgi:application"]
+
+# Copy entrypoint script
+COPY entrypoint.sh /code/entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /code/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/code/entrypoint.sh"]
+# # Command to run the server
+# CMD ["gunicorn", "--bind", "0.0.0.0:8004", "payment_service.wsgi:application"]
